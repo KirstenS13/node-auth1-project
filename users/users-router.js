@@ -6,9 +6,16 @@ const router = express.Router()
 // use POST for creating a user
 router.post("/register", async (req, res, next) => {
     try {
-        res.json({
-            message: "This is the register endpoint"
-        })
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            res.status(401).json({
+                message: "Please provide a username and password"
+            })
+        }
+
+
+
     } catch (err) {
         next(err)
     }
