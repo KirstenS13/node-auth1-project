@@ -1,4 +1,6 @@
 const express = require("express")
+const Users = require("./users-model")
+const bcrypt = require("bcryptjs")
 
 const router = express.Router()
 
@@ -6,15 +8,21 @@ const router = express.Router()
 // use POST for creating a user
 router.post("/register", async (req, res, next) => {
     try {
-        const { username, password } = req.body;
+        const { username, password } = req.body
+        const user = await Users.findBy({ username }).first()
 
-        if (!username || !password) {
-            res.status(401).json({
-                message: "Please provide a username and password"
+        if (user) {
+            return res.status(409).json({
+                message: "Username is already taken",
             })
         }
 
+        const newUser = await Users.add({
+            username: username,
+            password: await bcrypt.hash(password, 14)
+        })
 
+        res.status(201).json(newUser)
 
     } catch (err) {
         next(err)
@@ -36,9 +44,8 @@ router.post("/login", async (req, res, next) => {
 // get list of users if logged in
 router.get("/users", async (req, res, next) => {
     try {
-        res.json({
-            message: "This is the users endpoint"
-        })
+        const users = await Users.find()
+        res.json(users)
     } catch (err) {
         next(err)
     }

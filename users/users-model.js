@@ -2,7 +2,7 @@ const db = require("../data/config")
 
 // find
 function find() {
-    return db("users").select("id", "username")
+    return db("users").select("id", "username").orderBy("id")
 }
 
 // findBy
@@ -21,7 +21,7 @@ function findById(id) {
 }
 
 // add
-async function add() {
+async function add(user) {
     const [id] = await db("users").insert(user)
     return findById(id)
 }
