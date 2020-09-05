@@ -33,8 +33,27 @@ router.post("/register", async (req, res, next) => {
 // use POST for logging in
 router.post("/login", async (req, res, next) => {
     try {
+        const { username, password } = req.body
+        const user = await Users.findBy({ username }).first()
+
+        if (!user) {
+            return res.status(401).json({
+                message: "You shall not pass!!",
+            })
+        }
+
+        const passwordValid = await bcrypt.compare(password, user.password)
+
+        if (!passwordValid) {
+            return res.status(401).json({
+                message: "You shall not pass!!",
+            })
+        }
+
+        req.session.user = user
+
         res.json({
-            message: "This is the login endpoint"
+            message: `${user.username} is now logged in`
         })
     } catch (err) {
         next(err)
