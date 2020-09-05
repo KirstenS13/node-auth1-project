@@ -63,6 +63,12 @@ router.post("/login", async (req, res, next) => {
 // get list of users if logged in
 router.get("/users", async (req, res, next) => {
     try {
+        if (!req.session || !req.session.user) {
+            return res.status(401).json({
+                message: "You shall not pass!!"
+            })
+        }
+        
         const users = await Users.find()
         res.json(users)
     } catch (err) {
